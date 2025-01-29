@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneumonia Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --glass-color: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shine: rgba(255, 255, 255, 0.05);
+            --accent-color: rgba(76, 201, 240, 0.8);
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(45deg, #000000, #121f35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #4cc9f0, #00b4d8);
+            border-radius: 2px;
+        }
+
+        .button {
+            width: 100%;
+            margin-top: 8px;
+            background: linear-gradient(45deg, #4cc9f0, #00b4d8);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .button:hover::before {
+            left: 100%;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 201, 240, 0.3);
+        }
+
+        .result h2 {
+            color: #34d399;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            font-size: 1rem;
+            text-align: center;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Gradient orbs for background effect */
+        .orb {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            background: radial-gradient(circle, #0059ff 0%, transparent 80%);
+            top: -300px;
+            right: -200px;
+        }
+
+        .orb-2 {
+            background: radial-gradient(circle, #0059ff 0%, transparent 70%);
+            bottom: -300px;
+            left: -200px;
+        }
+
+        /* Main glass container */
+        .glass-container {
+            /* background: rgba(255, 255, 255, 0.05); */ /*white shade */
+            background: rgba(28, 32, 40, 0.7); /*dark shade */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                inset 0 0 32px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Glass shine effect */
+        .glass-shine {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--glass-shine),
+                transparent
+            );
+            transform: skewX(-15deg) translateX(-100%);
+            animation: shine 8s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: skewX(-15deg) translateX(-100%); }
+            50% { transform: skewX(-15deg) translateX(100%); }
+            100% { transform: skewX(-15deg) translateX(100%); }
+        }
+
+        /* Inner glass components */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--glass-shine),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: cardShine 6s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes cardShine {
+            0% { transform: rotate(45deg) translateX(-100%); }
+            50% { transform: rotate(45deg) translateX(100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            background: linear-gradient(45deg, #4cc9f0, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(76, 201, 240, 0.3);
+        }
+
+        /* File upload glass effect */
+        .file-upload {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px dashed rgba(76, 201, 240, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            background: rgba(76, 201, 240, 0.05);
+            border-color: rgba(76, 201, 240, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .file-upload::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle,
+                rgba(76, 201, 240, 0.1),
+                transparent 70%
+            );
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Result and error glass cards */
+        .result, .error {
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result {
+            background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Glass text style */
+        p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .upload-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .glass-container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+
+            .file-upload {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background gradient orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- Main glass container -->
+    <div class="glass-container">
+        <div class="glass-shine"></div>
+        
+        <h1>Pneumonia Detection</h1>
+        <p>Upload a X-ray image for an AI-powered pneumonia detection analysis</p>
+
+        <div class="glass-card">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="file-upload">
+                    <input type="file" name="file" id="file" accept="image/*" required>
+                    <div class="upload-icon">📋</div>
+                    <div class="upload-text">
+                        Drag and drop your X-ray image here<br>or click to browse
+                    </div>
+                </div>
+             <button type="submit" class="button"> Analyze X-ray</button>
+            </form>
+        </div>
+
+        {% if prediction %}
+        <div class="result">
+            <h2>Prediction Result: {{ prediction }}</h2>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
