@@ -330,15 +330,26 @@
         <div class="glass-card">
             <form method="POST" enctype="multipart/form-data">
                 <div class="file-upload">
-                    <input type="file" name="file" id="file" accept="image/*" required>
+                    <input type="file" name="file" id="file" accept="image/*" required onchange="updateFileName(this)">
                     <div class="upload-icon">📋</div>
-                    <div class="upload-text">
+                    <div class="upload-text" id="upload-text">
                         Drag and drop your X-ray image here<br>or click to browse
                     </div>
                 </div>
              <button type="submit" class="button"> Analyze X-ray</button>
             </form>
         </div>
+
+        <script>
+            function updateFileName(input) {
+                const uploadText = document.getElementById('upload-text');
+                if (input.files.length > 0) {
+                    uploadText.innerHTML = `<strong>Selected File:</strong> ${input.files[0].name}`;
+                } else {
+                    uploadText.innerHTML = "Drag and drop your X-ray image here<br>or click to browse";
+                }
+            }
+        </script>
 
         {% if prediction %}
         <div class="result">
