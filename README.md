@@ -1,2 +1,2 @@
 a
-s# Pneumonia-Detection-
+# Pneumonia-Detection-
