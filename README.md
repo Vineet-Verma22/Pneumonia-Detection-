@@ -1,2 +1,1 @@
-a
 # Pneumonia-Detection-
