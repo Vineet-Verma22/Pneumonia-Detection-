@@ -1,4 +1,1 @@
-s
-ss
-s# Pneumonia-Detection
-s
+# Pneumonia-Detection
