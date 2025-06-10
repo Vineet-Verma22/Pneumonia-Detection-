@@ -1,2 +1,2 @@
-cv# Pneumonia-Detection
+dscv# Pneumonia-Detection
 s
