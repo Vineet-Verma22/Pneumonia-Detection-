@@ -1,2 +1,1 @@
- vxfdsfbgzxccvdscv# Pneumonia-Detection
-s
+# Pneumonia-Detection
