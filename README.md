@@ -1,4 +1,1 @@
-
-s
-tre
-dsazc# Pneumonia-Detection
+sazc# Pneumonia-Detection
