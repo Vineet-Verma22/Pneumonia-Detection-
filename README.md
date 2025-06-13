@@ -1,1 +1,1 @@
-sazc# Pneumonia-Detection
+# Pneumonia-Detection
